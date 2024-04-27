@@ -40,3 +40,6 @@ func (ds *DiscoveryService) ScanPorts() map[string][]int {
 
 	return results
 }
+func (ds *DiscoveryService) GetPortMap() map[string][]int {
+	return ds.PortMap
+}
