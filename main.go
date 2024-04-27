@@ -2,46 +2,42 @@ package main
 
 import (
 	"fmt"
-	"net"
 	"time"
+
+	"github.com/dimanchick22/service_controllers/portscanner"
 )
 
-// Функция сканирования портов на заданном хосте в указанном диапазоне и обновления мапы с найденными портами
-func scanPorts(host string, startPort, endPort int, portMap map[string][]int) {
-	fmt.Printf("Начало сканирования портов на хосте %s...\n", host)
-	for port := startPort; port <= endPort; port++ {
-		target := fmt.Sprintf("%s:%d", host, port)
-		_, err := net.DialTimeout("tcp", target, 500*time.Millisecond)
-		if err == nil {
-			portMap[host] = append(portMap[host], port)
-			fmt.Printf("Порт %d на хосте %s обнаружен и добавлен в мапу\n", port, host)
-		}
-	}
-	fmt.Printf("Завершение сканирования портов на хосте %s\n", host)
+func main() {
+	configFile := "config.txt" // Имя файла конфигурации
+	// Вызов новой функции для сканирования портов
+	scanPortsForever(configFile)
 }
 
-func main() {
-	// Заданные хосты и диапазон портов для сканирования
-	hosts := []string{"127.0.0.1", "192.168.1.11"} // Замените на ваши хосты
-	startPort := 8000
-	endPort := 8200
+// Функция для сканирования портов и вывода результатов в бесконечном цикле
+func scanPortsForever(configFile string) {
+	// Чтение конфигурационного файла
+	portMap, startPort, endPort, err := portscanner.ReadConfig(configFile)
+	if err != nil {
+		fmt.Printf("Ошибка чтения файла конфигурации: %v\n", err)
+		return
+	}
 
 	// Мапа для хранения найденных портов
-	portMap := make(map[string][]int)
+	results := make(map[string][]int)
 
 	// Бесконечный цикл для постоянного сканирования портов
 	for {
 		fmt.Println("Начало нового цикла сканирования портов...")
 
 		// Сканирование портов для каждого хоста
-		for _, host := range hosts {
+		for host:= range portMap {
 			// Сканирование портов и обновление мапы
-			scanPorts(host, startPort, endPort, portMap)
+			portscanner.ScanPorts(host, startPort, endPort, results)
 		}
 
 		// Вывод актуальной информации о портах
 		fmt.Println("Актуальная информация о портах:")
-		for host, ports := range portMap {
+		for host, ports := range results {
 			fmt.Printf("Хост: %s, Порты: %v\n", host, ports)
 		}
 
