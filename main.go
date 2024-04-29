@@ -153,7 +153,6 @@ func main() {
 	flag.Parse()
 
 
-
 	// Создаем экземпляр сервиса обнаружения
 	discoveryService := discovery.NewDiscoveryService(*configFile,StartPorts,EndPorts)
 
